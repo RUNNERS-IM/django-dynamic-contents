@@ -1,0 +1,8 @@
+# Python
+requests
+
+# Django
+Django
+django-filter
+djangorestframework
+drf-yasg
