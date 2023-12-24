@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 # App
-from django_package_app.views import ModelNameViewSet
+from dynamic_contents.views import ModelNameViewSet
 
 
 # Variables

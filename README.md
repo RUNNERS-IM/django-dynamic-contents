@@ -1,67 +1,96 @@
-# django-package-boilerplate
+# Django Dynamic Content
+
+A Django library for creating and managing dynamic, customizable content structures with ease. Designed to enhance multilingual support in Django applications, it facilitates the creation of HTML or text content that can be easily translated into multiple languages, offering a flexible solution for integrating varied content parts.
 
 ## 1. Installation
 
 The preferred installation method is directly from pypi:
 
 ```bash
-# Create promgen setting directory.
-$ pip install -U django-package-app
+$ pip install -U django-dynamic-contents
 ```
 
 ## 2. Quickstart
 
-In ``settings.py``:
+### Step 1: Update settings.py
+
+Add modeltranslation and dynamic_contents to your INSTALLED_APPS in settings.py:
 
 ```python
 INSTALLED_APPS = [
     ...,
-    'django_package_app'
+    'modeltranslation',
+    'dynamic_contents'
 ]
 ```
 
-2. In ``urls.py``:
+### Step 2: Update urls.py
+
+Include the package's URLs in your project's urls.py:
 
 ```python
 from django.urls import path, include
 
 urlpatterns = [
     ...,
-    path('django_package_app/', include('django_package_app.urls')),
+    path('dynamic_contents/', include('dynamic_contents.urls')),
 ]
 ```
 
-3. Run ``python manage.py migrate``
-Create the models.
+### Step 3: Database Migration
+
+Run the migration command to create the necessary models:
+
 ```bash
 $ python manage.py migrate
 ```
 
 ## 3. Configuration
-- Language setting: Todo
+
+Customize the package to fit your needs. Language settings and other configurations can be updated as required.
+
+```python
+LANGUAGES = [  # supported languages
+    ("en", gettext_noop("English")),
+    ("ja", gettext_noop("Japanese")),
+    ("ko", gettext_noop("Korean")),
+]
+```
 
 ## 4. Update Package
 
-In ``setup.cfg``, upgrade version
+To update the package, follow these steps:
+
+### Update Version in setup.cfg
+
+In setup.cfg, change the version number:
+
 ```
 [metadata]
-name = django-package-app
+name = django-dynamic-contents
 version = x.x.x
 ...
 ```
 
-Build package
+### Build package
+
+Run the following commands to build the package:
 ```bash
 $ python setup.py sdist bdist_wheel
 ```
 
-Deploy package
+### Deploy package
+
+Upload the new version to PyPI:
 ```bash
-$ twine upload --verbose dist/django-package-app-x.x.x.tar.gz
+$ twine upload --verbose dist/django-dynamic-contents-x.x.x.tar.gz
 ```
 
 ## The MIT License
 
+Django Dynamic Content is licensed under the MIT License, ensuring it's free to use and modify:
+
+```
 Copyright (c) 2023 Runners Co., Ltd.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -81,3 +110,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```

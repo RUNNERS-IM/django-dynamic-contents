@@ -34,7 +34,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('django_package_app/', include('django_package_app.urls')),
+    path('django_package_app/', include('dynamic_contents.urls')),
 ]
 
 if settings.DEBUG:

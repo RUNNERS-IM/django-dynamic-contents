@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'django_filters',
-    'django_package_app',
+    'dynamic_contents',
 ]
 
 MIDDLEWARE = [
@@ -118,11 +118,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-LANGUAGES = [  # supported languages
-    ("en", gettext_noop("English")),
-    ("ja", gettext_noop("Japanese")),
-    ("ko", gettext_noop("Korean")),
-]
+LANGUAGES = (
+    ('en', 'English'),
+    ('ko', 'Korean'),
+)
 
 TIME_ZONE = 'UTC'
 
@@ -140,3 +139,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# MODELTRANSLATION
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+
+# DYNAMIC_CONTENT
+DYNAMIC_CONTENT_CHOICES = [
+    ('ALARM', '알람'),
+    ('HISTORY', '히스토리')
+]

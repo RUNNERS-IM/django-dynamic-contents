@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class DjangoPackageAppConfig(AppConfig):
+class DynamicContentAppConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'django_package_app'
+    name = 'dynamic_contents'
