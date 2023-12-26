@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True, null=True, verbose_name='생성일자')),
                 ('updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='수정일자')),
-                ('type', models.CharField(choices=[('ALARM', '알람'), ('HISTORY', '히스토리')], max_length=100, verbose_name='Type (유형)')),
+                ('type', models.CharField(max_length=100, verbose_name='Type (유형)')),
                 ('content', models.TextField(verbose_name='Content (내용)')),
             ],
             options={
