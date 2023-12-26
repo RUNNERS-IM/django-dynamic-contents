@@ -23,6 +23,7 @@ class BaseModel(models.Model):
 class Format(BaseModel):
 
     type = models.CharField('Type (유형)', max_length=100)
+    subtype = models.CharField('Sub Type (세부 유형)', max_length=100, null=True, blank=True)
     content = models.TextField('Content (내용)')  # "{user}가 {post}를 좋아요합니다."
 
     class Meta:
@@ -126,9 +127,6 @@ class DynamicContentModelMixin(models.Model):
         format_string = self.format.content
         for part in self.parts.all():
             format_string = format_string.replace("{" + part.field + "}", part.content or '')
-        if self.content_text != format_string:
-            self.content_text = format_string
-            self.save(update_fields=['content_text'])
         return format_string
 
     @property
@@ -138,10 +136,9 @@ class DynamicContentModelMixin(models.Model):
             replacement = part.content or ''
             if part.link:
                 replacement = f'<a href="{part.link}">{replacement}</a>'
+            else:
+                replacement = f'<a>{replacement}</a>'
             format_string = format_string.replace("{" + part.field + "}", replacement)
-        if self.content_html != format_string:
-            self.content_html = format_string
-            self.save(update_fields=['content_html'])
         return format_string
 
     def add_part(self, field, content, link=None, instance_id=None):

@@ -7,7 +7,7 @@ from .models import Format, Part
 
 # Main Section
 class FormatAdmin(admin.ModelAdmin):
-    list_display = ('id', 'type', 'content', 'created_at', 'updated_at')
+    list_display = ('id', 'type', 'subtype', 'content', 'created_at', 'updated_at')
     search_fields = ('type', 'content')
 
 
