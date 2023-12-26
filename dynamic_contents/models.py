@@ -98,7 +98,7 @@ class DynamicContentManagerMixin:
         return dynamic_content
 
 
-class DynamicContentModelMixin:
+class DynamicContentModelMixin(models.Model):
 
     format = models.ForeignKey(Format, on_delete=models.CASCADE, related_name='contents')
     parts = models.ManyToManyField(Part, related_name='contents')
