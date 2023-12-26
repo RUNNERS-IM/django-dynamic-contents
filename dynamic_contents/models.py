@@ -22,7 +22,7 @@ class BaseModel(models.Model):
 # Format
 class Format(BaseModel):
 
-    type = models.CharField('Type (유형)', max_length=100, choices=settings.DYNAMIC_CONTENT_CHOICES)
+    type = models.CharField('Type (유형)', max_length=100)
     content = models.TextField('Content (내용)')  # "{user}가 {post}를 좋아요합니다."
 
     class Meta:
@@ -176,4 +176,4 @@ class DynamicContentModelMixin:
         DynamicContent를 삭제하기 전에 관련된 모든 파트를 삭제합니다.
         """
         self.parts.all().delete()
-        super(DynamicContent, self).delete(*args, **kwargs)
+        super(DynamicContentModelMixin, self).delete(*args, **kwargs)
