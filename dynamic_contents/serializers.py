@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Format, Part, DynamicContent
+from .models import Format, Part
 
 
 class FormatSerializer(serializers.ModelSerializer):
@@ -14,9 +14,9 @@ class PartSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class DynamicContentSerializer(serializers.ModelSerializer):
+class DynamicContentSerializerMixin:
+    format = FormatSerializer(read_only=True)
     parts = PartSerializer(many=True, read_only=True)
 
     class Meta:
-        model = DynamicContent
-        fields = ['id', 'format', 'parts', 'content']
+        fields = ['id', 'format', 'parts', 'content_text', 'content_html', 'created_at', 'updated_at']

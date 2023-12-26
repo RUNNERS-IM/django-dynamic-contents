@@ -1,10 +1,20 @@
+
 # Django Dynamic Content
 
-A Django library for creating and managing dynamic, customizable content structures with ease. Designed to enhance multilingual support in Django applications, it facilitates the creation of HTML or text content that can be easily translated into multiple languages, offering a flexible solution for integrating varied content parts.
+A Django library for creating and managing dynamic, customizable content structures with ease. It enhances multilingual support in Django applications, facilitating the creation of HTML or text content that can be easily translated into multiple languages. This library offers a flexible solution for integrating varied content parts, making it ideal for managing dynamic content structures.
+
+## Features
+
+- Create and manage dynamic content formats.
+- Easily integrate with multilingual setups using Django Modeltranslation.
+- Add and update content parts dynamically.
+- Generate text or HTML content based on customizable formats.
+- Extensive admin interface for managing dynamic contents and parts.
+- REST API support for dynamic content management.
 
 ## 1. Installation
 
-The preferred installation method is directly from pypi:
+Install directly from PyPI:
 
 ```bash
 $ pip install -U django-dynamic-contents
@@ -12,9 +22,9 @@ $ pip install -U django-dynamic-contents
 
 ## 2. Quickstart
 
-### Step 1: Update settings.py
+### Step 1: Update `settings.py`
 
-Add modeltranslation and dynamic_contents to your INSTALLED_APPS in settings.py:
+Add `modeltranslation` and `dynamic_contents` to your `INSTALLED_APPS`:
 
 ```python
 INSTALLED_APPS = [
@@ -24,9 +34,9 @@ INSTALLED_APPS = [
 ]
 ```
 
-### Step 2: Update urls.py
+### Step 2: Update `urls.py`
 
-Include the package's URLs in your project's urls.py:
+Include the package's URLs:
 
 ```python
 from django.urls import path, include
@@ -39,7 +49,7 @@ urlpatterns = [
 
 ### Step 3: Database Migration
 
-Run the migration command to create the necessary models:
+Run migrations to create necessary models:
 
 ```bash
 $ python manage.py migrate
@@ -47,23 +57,105 @@ $ python manage.py migrate
 
 ## 3. Configuration
 
-Customize the package to fit your needs. Language settings and other configurations can be updated as required.
+Customize settings as required:
 
 ```python
-LANGUAGES = [  # supported languages
-    ("en", gettext_noop("English")),
-    ("ja", gettext_noop("Japanese")),
-    ("ko", gettext_noop("Korean")),
+# Supported languages
+LANGUAGES = [
+    ("en", "English"),
+    ("ja", "Japanese"),
+    ("ko", "Korean"),
+]
+
+# DYNAMIC_CONTENT
+DYNAMIC_CONTENT_CHOICES = [
+    ('ALARM', '알람'),
+    ('HISTORY', '히스토리')
 ]
 ```
 
-## 4. Update Package
+## 4. Usage
 
-To update the package, follow these steps:
+#### 모델 정의
 
-### Update Version in setup.cfg
+먼저, `DynamicContentModelMixin`과 `DynamicContentManagerMixin`을 사용하여 모델과 매니저를 정의합니다. 이 예시에서는 `DynamicContent`라는 커스텀 모델을 만듭니다.
 
-In setup.cfg, change the version number:
+```python
+from django.db import models
+from myapp.mixins import DynamicContentModelMixin, DynamicContentManagerMixin
+
+class DynamicContentManager(models.Manager, DynamicContentManagerMixin):
+    pass
+
+class DynamicContent(models.Model, DynamicContentModelMixin):
+    objects = DynamicContentManager()
+
+    # 추가 필드 정의 (필요한 경우)
+    # 예: title = models.CharField(max_length=200)
+```
+
+#### DynamicContent 객체 생성
+
+DynamicContent 객체를 생성할 때는 `DynamicContentManagerMixin`에 정의된 `create_dynamic_content` 메서드를 사용합니다. 이 메서드는 `format`과 `parts` 데이터를 인자로 받아 새로운 `DynamicContent` 객체를 생성합니다.
+
+```python
+format = Format.objects.get(type='ALARM')  # 미리 정의된 Format 객체
+parts_data = [
+    {'field': 'user', 'content': '사용자 이름'},
+    {'field': 'post', 'content': '포스트 내용'}
+]
+
+dynamic_content = DynamicContent.objects.create_dynamic_content(format, parts_data)
+```
+
+#### DynamicContent 객체 업데이트
+
+기존의 `DynamicContent` 객체를 업데이트할 때는 `update_dynamic_content` 메서드를 사용합니다. 이 메서드는 `dynamic_content` 객체, 새로운 `format`, 그리고 업데이트할 `parts` 데이터를 인자로 받습니다.
+
+```python
+new_format = Format.objects.get(type='HISTORY')
+new_parts_data = [
+    {'field': 'user', 'content': '새로운 사용자 이름'},
+    {'field': 'post', 'content': '업데이트된 포스트 내용'}
+]
+
+updated_dynamic_content = DynamicContent.objects.update_dynamic_content(dynamic_content, new_format, new_parts_data)
+```
+
+#### DynamicContent 텍스트와 HTML 내용 사용
+
+`DynamicContentModelMixin`은 `text`와 `html` 속성을 제공합니다. 이들은 각각 텍스트 기반과 HTML 기반의 동적 콘텐츠를 생성합니다.
+
+```python
+# 텍스트 기반 콘텐츠
+text_content = dynamic_content.text
+
+# HTML 기반 콘텐츠
+html_content = dynamic_content.html
+```
+
+이 예시는 `DynamicContentModelMixin`과 `DynamicContentManagerMixin`을 활용하는 기본적인 방법을 보여줍니다. 이들은 동적 콘텐츠 관리에 유연성과 편의성을 제공합니다.
+
+
+### Models and Managers
+
+- `Format`: Define the format of dynamic content.
+- `Part`: Manage parts of the dynamic content.
+- `DynamicContent`: Create and manage dynamic content instances.
+
+### Admin Interface
+
+Use the Django admin interface to manage formats, parts, and dynamic contents.
+
+### API Usage
+
+Leverage provided API views and serializers for handling dynamic contents in RESTful services.
+
+## 5. Updating the Package
+
+### Update Version in `setup.cfg`
+
+Change the version number in `setup.cfg`:
 
 ```
 [metadata]
@@ -72,23 +164,23 @@ version = x.x.x
 ...
 ```
 
-### Build package
+### Build the Package
 
-Run the following commands to build the package:
 ```bash
 $ python setup.py sdist bdist_wheel
 ```
 
-### Deploy package
+### Deploy the Package
 
-Upload the new version to PyPI:
+Upload to PyPI:
+
 ```bash
 $ twine upload --verbose dist/django-dynamic-contents-x.x.x.tar.gz
 ```
 
-## The MIT License
+## License
 
-Django Dynamic Content is licensed under the MIT License, ensuring it's free to use and modify:
+Django Dynamic Content is under the MIT License:
 
 ```
 Copyright (c) 2023 Runners Co., Ltd.

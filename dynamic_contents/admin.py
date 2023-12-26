@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 # App
-from .models import Format, Part, DynamicContent
+from .models import Format, Part
 
 
 # Main Section
@@ -21,13 +21,12 @@ class PartInline(admin.TabularInline):
     extra = 1  # 기본적으로 보여줄 빈 인라인 폼의 수
 
 
-class DynamicContentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'format', 'content', 'created_at', 'updated_at')
-    search_fields = ('content',)
-    filter_horizontal = ('parts',)
+class DynamicContentAdminMixin:
+    list_display = ('id', 'format', 'content_text', 'created_at', 'updated_at')
+    search_fields = ('content_text',)
     inlines = [PartInline]
+    list_filter = ('format',)
 
 
 admin.site.register(Format, FormatAdmin)
 admin.site.register(Part, PartAdmin)
-admin.site.register(DynamicContent, DynamicContentAdmin)

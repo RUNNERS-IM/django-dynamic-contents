@@ -7,8 +7,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 # App
 from dynamic_contents import pagination
-from .serializers import FormatSerializer, PartSerializer, DynamicContentSerializer
-from .models import Format, Part, DynamicContent
+from .serializers import FormatSerializer, PartSerializer
+from .models import Format, Part
 
 
 # Classes
@@ -28,12 +28,13 @@ class FormatViewSet(
     ordering_fields = ['created_at', 'type']
 
 
-class DynamicContentViewSet(
+class PartViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     BaseGenericViewSet
 ):
-    queryset = DynamicContent.objects.all()
-    serializer_class = DynamicContentSerializer
-    search_fields = ['content']
-    ordering_fields = ['created_at']
+    queryset = Part.objects.all()
+    serializer_class = FormatSerializer
+    search_fields = ['field', 'content', 'link']
+    ordering_fields = ['created_at', 'type']
+    filterset_fields = ['instance_id']
