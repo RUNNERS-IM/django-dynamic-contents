@@ -51,49 +51,42 @@ class Part(BaseModel):
 
     def save(self, *args, **kwargs):
         super(Part, self).save(*args, **kwargs)
-        # Part와 연관된 모든 DynamicContent 객체를 업데이트합니다.
-        for dynamic_content in self.contents.all():
-            dynamic_content.save()
 
 
 # Dynamic Content
 class DynamicContentManagerMixin:
 
-    def create_dynamic_content(self, format, parts_data):
+    def create_dynamic_content(self, format, parts):
         """
         Create a new DynamicContent object with the given format and parts.
 
         :param format: The Format object for the DynamicContent.
-        :param parts_data: List of dictionaries containing data for creating Part objects.
-                           Each dictionary should have keys: 'field', 'content', 'link' (optional), 'instance_id' (optional).
+        :param parts: List of Part objects.
         :return: The created DynamicContent object.
         """
         # DynamicContent 객체 생성
         dynamic_content = self.create(format=format)
 
-        # Part 객체들 생성 및 연결
-        for part_data in parts_data:
-            part = Part.objects.create(**part_data)
+        # Part 객체들 연결
+        for part in parts:
             dynamic_content.parts.add(part)
 
         return dynamic_content
 
-    def update_dynamic_content(self, dynamic_content, format, parts_data):
+    def update_dynamic_content(self, dynamic_content, format, parts):
         """
         Update the format and parts of the given DynamicContent object.
 
         :param dynamic_content: The DynamicContent object to update.
         :param format: The Format object for the DynamicContent.
-        :param parts_data: List of dictionaries containing data for creating Part objects.
-                           Each dictionary should have keys: 'field', 'content', 'link' (optional), 'instance_id' (optional).
+        :param parts: List of Part objects.
         :return: The updated DynamicContent object.
         """
         # 기존 Part 객체들 삭제
         dynamic_content.parts.clear()
 
-        # Part 객체들 생성 및 연결
-        for part_data in parts_data:
-            part = Part.objects.create(**part_data)
+        # Part 객체들 연결
+        for part in parts:
             dynamic_content.parts.add(part)
 
         # Format 업데이트
