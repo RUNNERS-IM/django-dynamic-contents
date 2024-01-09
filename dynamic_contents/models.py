@@ -3,14 +3,15 @@ import re
 
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 # Class Section
 class BaseModel(models.Model):
 
     # Dates
-    created_at = models.DateTimeField('생성일자', auto_now_add=True, null=True)
-    updated_at = models.DateTimeField('수정일자', auto_now=True, null=True)
+    created_at = models.DateTimeField(_('생성일자'), auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(_('수정일자'), auto_now=True, null=True)
 
     class Meta:
         abstract = True
@@ -22,9 +23,9 @@ class BaseModel(models.Model):
 # Format
 class Format(BaseModel):
 
-    type = models.CharField('Type (유형)', max_length=100)
-    subtype = models.CharField('Sub Type (세부 유형)', max_length=100, null=True, blank=True)
-    content = models.TextField('Content (내용)')  # "{user}가 {post}를 좋아요합니다."
+    type = models.CharField(_('Type (유형)'), max_length=100)
+    subtype = models.CharField(_('Sub Type (세부 유형)'), max_length=100, null=True, blank=True)
+    content = models.TextField(_('Content (내용)'))  # "{user}가 {post}를 좋아요합니다."
 
     class Meta:
         verbose_name = 'format'
@@ -37,10 +38,10 @@ class Format(BaseModel):
 
 # Part
 class Part(BaseModel):
-    field = models.TextField('Field (필드)', null=True, blank=True)  # user
-    content = models.TextField('Content (내용)', null=True, blank=True)  # 김선욱
-    link = models.URLField('Link (링크)', null=True, blank=True)  # https://runners.im/sun
-    instance_id = models.TextField('Instance ID (인스턴스 ID)', null=True, blank=True)  # 1
+    field = models.TextField(_('Field (필드)'), null=True, blank=True)  # user
+    content = models.TextField(_('Content (내용)'), null=True, blank=True)  # 김선욱
+    link = models.URLField(_('Link (링크)'), null=True, blank=True)  # https://runners.im/sun
+    instance_id = models.TextField(_('Instance ID (인스턴스 ID)'), null=True, blank=True)  # 1
 
     class Meta:
         verbose_name = 'part'
@@ -104,8 +105,8 @@ class DynamicContentModelMixin(models.Model):
     format = models.ForeignKey(Format, on_delete=models.CASCADE, related_name='contents')
     parts = models.ManyToManyField(Part, related_name='contents')
 
-    content_text = models.TextField('Text Content', null=True, blank=True)
-    content_html = models.TextField('Html Content', null=True, blank=True)
+    content_text = models.TextField(_('Text Content'), null=True, blank=True)
+    content_html = models.TextField(_('Html Content'), null=True, blank=True)
 
     class Meta:
         abstract = True

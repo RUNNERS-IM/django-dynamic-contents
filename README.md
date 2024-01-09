@@ -72,6 +72,12 @@ DYNAMIC_CONTENT_CHOICES = [
     ('ALARM', '알람'),
     ('HISTORY', '히스토리')
 ]
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+
+MIGRATION_MODULES = {
+    'dynamic_contents': 'migrations.dynamic_contents',
+}
 ```
 
 ## 4. Usage
