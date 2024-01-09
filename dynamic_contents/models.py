@@ -1,9 +1,9 @@
 # Django
 import re
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language
 
 
 # Class Section
@@ -105,69 +105,40 @@ class DynamicContentModelMixin(models.Model):
     format = models.ForeignKey(Format, on_delete=models.CASCADE, related_name='contents')
     parts = models.ManyToManyField(Part, related_name='contents')
 
-    content_text = models.TextField(_('Text Content'), null=True, blank=True)
-    content_html = models.TextField(_('Html Content'), null=True, blank=True)
-
     class Meta:
         abstract = True
 
     def __str__(self):
         return '{}'.format(self.content_text)
 
-    def save(self, *args, **kwargs):
-        super(DynamicContentModelMixin, self).save(*args, **kwargs)
+    def get_text(self):
+        current_language = get_language()
+        content_field = f"content_{current_language}"
+        format_string = getattr(self.format, content_field, self.format.content)
 
-    def validate_parts_with_format(self):
-        required_fields = re.findall(r"\{(\w+)\}", self.format.content)
-        for field in required_fields:
-            if not self.parts.filter(field=field).exists():
-                raise ValueError(f"필수 파트 '{field}'가 누락되었습니다.")
-
-    @property
-    def text(self):
-        format_string = self.format.content
         for part in self.parts.all():
-            format_string = format_string.replace("{" + part.field + "}", part.content or '')
+            format_string = format_string.replace("{{" + part.field + "}}", part.content or '')
         return format_string
 
-    @property
-    def html(self):
-        format_string = self.format.content
-        for part in self.parts.all():
+    def get_html(self):
+        current_language = get_language()
+        content_field = f"content_{current_language}"
+        format_string = getattr(self.format, content_field, self.format.content)
+
+        # Part 객체를 순회하며 필드를 대체 문자열로 변환
+        for idx, part in enumerate(self.parts.all()):
             replacement = part.content or ''
             if part.link:
                 replacement = f'<a href="{part.link}">{replacement}</a>'
-            else:
-                replacement = f'<a>{replacement}</a>'
-            format_string = format_string.replace("{" + part.field + "}", replacement)
+            placeholder = f"{{{{{part.field}}}}}"
+            format_string = format_string.replace(placeholder, f'<{idx}>{replacement}</{idx}>')
+
         return format_string
 
-    def add_part(self, field, content, link=None, instance_id=None):
-        """
-        새로운 Part를 이 DynamicContent에 추가합니다.
-
-        사용 예시:
-        dynamic_content = DynamicContent.objects.get(id=some_id)
-        new_part = dynamic_content.add_part(field='new_field', content='new content')
-        """
-        part = Part.objects.create(field=field, content=content, link=link, instance_id=instance_id)
-        self.parts.add(part)
-        return part
-
-    def update_parts(self, parts_data):
-        """
-        이 DynamicContent의 모든 Part를 업데이트합니다.
-        parts_data는 각 Part에 대한 데이터를 담은 딕셔너리의 리스트입니다.
-
-        사용 예시:
-        parts_data = [{'field': 'field1', 'content': 'content1'}, {'field': 'field2', 'content': 'content2'}]
-        dynamic_content.update_parts(parts_data)
-        """
-        self.parts.clear()
-        for data in parts_data:
-            part = Part.objects.create(**data)
-            self.parts.add(part)
-        self.save()  # DynamicContent 업데이트
+    def save(self, *args, **kwargs):
+        self.content_text = self.get_text()
+        self.content_html = self.get_html()
+        super(DynamicContentModelMixin, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         """
