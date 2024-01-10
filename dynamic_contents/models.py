@@ -120,24 +120,42 @@ class DynamicContentModelMixin(models.Model):
             format_string = format_string.replace("{{" + part.field + "}}", part.content or '')
         return format_string
 
+    def get_i18n(self):
+        current_language = get_language()
+        content_field = f"content_{current_language}"
+        format_string = getattr(self.format, content_field, self.format.content)
+
+        # 플레이스홀더를 찾아서 순서대로 인덱스 매핑
+        placeholders = re.findall(r'\{\{(\w+)\}\}', format_string)
+        index_map = {placeholder: idx for idx, placeholder in enumerate(placeholders)}
+
+        # Part 객체를 순회하며 필드를 대체 문자열로 변환
+        for part in self.parts.all():
+            if part.field in index_map:
+                idx = index_map[part.field]
+                replacement = f'<{idx}>{part.content}</{idx}>'
+                placeholder = f"{{{{{part.field}}}}}"
+                format_string = format_string.replace(placeholder, replacement, 1)  # 한 번만 대체
+
+        return format_string
+
     def get_html(self):
         current_language = get_language()
         content_field = f"content_{current_language}"
         format_string = getattr(self.format, content_field, self.format.content)
 
         # Part 객체를 순회하며 필드를 대체 문자열로 변환
-        for idx, part in enumerate(self.parts.all()):
-            replacement = part.content or ''
-            if part.link:
-                replacement = f'<a href="{part.link}">{replacement}</a>'
+        for part in self.parts.all():
+            # 링크가 있거나 없거나 항상 <a> 태그를 사용
+            link = part.link or '#'
+            replacement = f'<a class="{part.field}" href="{link}">{part.content}</a>'
+
             placeholder = f"{{{{{part.field}}}}}"
-            format_string = format_string.replace(placeholder, f'<{idx}>{replacement}</{idx}>')
+            format_string = format_string.replace(placeholder, replacement)
 
         return format_string
 
     def save(self, *args, **kwargs):
-        self.content_text = self.get_text()
-        self.content_html = self.get_html()
         super(DynamicContentModelMixin, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

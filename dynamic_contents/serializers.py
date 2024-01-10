@@ -53,6 +53,7 @@ class DynamicContentSerializerMixin(serializers.Serializer):
 
         representation['parts'] = parts_dict
         representation['text'] = instance.get_text()
+        representation['i18n'] = instance.get_i18n()
         representation['html'] = instance.get_html()
 
         return representation
