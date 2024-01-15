@@ -3,3 +3,4 @@ include LICENSE
 include MANIFEST.in
 include setup.py
 include setup.cfg
+recursive-include dynamic_contents/*
