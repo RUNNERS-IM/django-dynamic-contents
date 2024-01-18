@@ -157,32 +157,6 @@ Use the Django admin interface to manage formats, parts, and dynamic contents.
 
 Leverage provided API views and serializers for handling dynamic contents in RESTful services.
 
-## 5. Updating the Package
-
-### Update Version in `setup.cfg`
-
-Change the version number in `setup.cfg`:
-
-```
-[metadata]
-name = django-dynamic-contents
-version = x.x.x
-...
-```
-
-### Build the Package
-
-```bash
-$ python setup.py sdist bdist_wheel
-```
-
-### Deploy the Package
-
-Upload to PyPI:
-
-```bash
-$ twine upload --verbose dist/django-dynamic-contents-x.x.x.tar.gz
-```
 
 ## License
 

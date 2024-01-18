@@ -102,8 +102,8 @@ class DynamicContentManagerMixin:
 
 class DynamicContentModelMixin(models.Model):
 
-    format = models.ForeignKey(Format, on_delete=models.CASCADE, related_name='contents')
-    parts = models.ManyToManyField(Part, related_name='contents')
+    format = models.ForeignKey(Format, on_delete=models.CASCADE)
+    parts = models.ManyToManyField(Part)
 
     class Meta:
         abstract = True
