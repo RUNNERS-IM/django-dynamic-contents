@@ -102,14 +102,14 @@ class DynamicContentManagerMixin:
 
 class DynamicContentModelMixin(models.Model):
 
-    format = models.ForeignKey(Format, on_delete=models.CASCADE)
+    format = models.ForeignKey(Format, on_delete=models.SET_NULL, null=True)
     parts = models.ManyToManyField(Part)
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return '{}'.format(self.content_text)
+        return self.get_text()
 
     def get_text(self):
         current_language = get_language()
