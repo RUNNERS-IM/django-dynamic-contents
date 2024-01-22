@@ -108,9 +108,6 @@ class DynamicContentModelMixin(models.Model):
     class Meta:
         abstract = True
 
-    def __str__(self):
-        return self.get_text()
-
     def get_text(self):
         current_language = get_language()
         content_field = f"content_{current_language}"
