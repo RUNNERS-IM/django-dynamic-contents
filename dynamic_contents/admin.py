@@ -1,6 +1,7 @@
 # vim: set fileencoding=utf-8 :
 from django.conf import settings
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 # Third Party
 from modeltranslation.admin import TranslationAdmin
@@ -44,10 +45,37 @@ class PartInline(admin.TabularInline):
 
 
 class DynamicContentAdminMixin:
-    list_display = ('id', 'format', 'content_text', 'created_at', 'updated_at')
-    search_fields = ('content_text',)
+    list_display = ('text_content', 'i18n_content', 'html_content')
     inlines = [PartInline]
     list_filter = ('format',)
+
+    def text_content(self, obj):
+        return obj.get_text()
+    text_content.short_description = 'Text Content'
+
+    def i18n_content(self, obj):
+        return obj.get_i18n()
+    i18n_content.short_description = 'I18N Content'
+
+    def html_content(self, obj):
+        return mark_safe(obj.get_html())
+    html_content.short_description = 'HTML Content'
+    html_content.allow_tags = True
+
+    def get_list_display(self, request):
+        # Dynamically append to list_display
+        original_list_display = super().get_list_display(request)
+        return original_list_display + self.append_list_display
+
+    def get_inlines(self, request, obj):
+        # Dynamically append to inlines
+        original_inlines = super().get_inlines(request, obj)
+        return original_inlines + self.append_inlines
+
+    def get_list_filter(self, request):
+        # Dynamically append to list_filter
+        original_list_filter = super().get_list_filter(request)
+        return original_list_filter + self.append_list_filter
 
 
 admin.site.register(Format, FormatAdmin)

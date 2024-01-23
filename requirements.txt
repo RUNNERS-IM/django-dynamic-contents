@@ -6,3 +6,4 @@ Django
 django-filter
 djangorestframework
 drf-yasg
+django-modeltranslation

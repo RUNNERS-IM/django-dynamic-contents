@@ -20,12 +20,25 @@ class BaseModel(models.Model):
         return '{}({})'.format(self.__class__.__name__, self.id)
 
 
+class FormatManager(models.Manager):
+    def update_format_if_needed(self, format, defaults):
+        updated = False
+        for key, value in defaults.items():
+            if not getattr(format, key):
+                setattr(format, key, value)
+                updated = True
+        if updated:
+            format.save()
+
+
 # Format
 class Format(BaseModel):
 
     type = models.CharField(_('Type (유형)'), max_length=100)
     subtype = models.CharField(_('Sub Type (세부 유형)'), max_length=100, null=True, blank=True)
     content = models.TextField(_('Content (내용)'))  # "{user}가 {post}를 좋아요합니다."
+
+    objects = FormatManager()
 
     class Meta:
         verbose_name = 'format'
@@ -109,6 +122,9 @@ class DynamicContentModelMixin(models.Model):
         abstract = True
 
     def get_text(self):
+        if not self.format:
+            return None
+
         current_language = get_language()
         content_field = f"content_{current_language}"
         format_string = getattr(self.format, content_field, self.format.content)
@@ -118,6 +134,9 @@ class DynamicContentModelMixin(models.Model):
         return format_string
 
     def get_i18n(self):
+        if not self.format:
+            return None
+
         current_language = get_language()
         content_field = f"content_{current_language}"
         format_string = getattr(self.format, content_field, self.format.content)
@@ -137,6 +156,9 @@ class DynamicContentModelMixin(models.Model):
         return format_string
 
     def get_html(self):
+        if not self.format:
+            return None
+
         current_language = get_language()
         content_field = f"content_{current_language}"
         format_string = getattr(self.format, content_field, self.format.content)

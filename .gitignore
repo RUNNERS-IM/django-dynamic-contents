@@ -339,3 +339,5 @@ aws-cgp-dev.pem
 aws-cgp-dev.pub
 aws-cgp-stg.pem
 aws-cgp-stg.pub
+
+*.sqlite3
