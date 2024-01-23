@@ -123,11 +123,14 @@ class DynamicContentModelMixin(models.Model):
 
     def get_text(self):
         if not self.format:
-            return None
+            return ''
 
         current_language = get_language()
         content_field = f"content_{current_language}"
         format_string = getattr(self.format, content_field, self.format.content)
+
+        if not format_string:
+            return ''
 
         for part in self.parts.all():
             format_string = format_string.replace("{{" + part.field + "}}", part.content or '')
@@ -135,11 +138,14 @@ class DynamicContentModelMixin(models.Model):
 
     def get_i18n(self):
         if not self.format:
-            return None
+            return ''
 
         current_language = get_language()
         content_field = f"content_{current_language}"
         format_string = getattr(self.format, content_field, self.format.content)
+
+        if not format_string:
+            return ''
 
         # 플레이스홀더를 찾아서 순서대로 인덱스 매핑
         placeholders = re.findall(r'\{\{(\w+)\}\}', format_string)
@@ -157,11 +163,14 @@ class DynamicContentModelMixin(models.Model):
 
     def get_html(self):
         if not self.format:
-            return None
+            return ''
 
         current_language = get_language()
         content_field = f"content_{current_language}"
         format_string = getattr(self.format, content_field, self.format.content)
+
+        if not format_string:
+            return ''
 
         # Part 객체를 순회하며 필드를 대체 문자열로 변환
         for part in self.parts.all():
