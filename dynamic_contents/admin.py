@@ -46,7 +46,6 @@ class PartInline(admin.TabularInline):
 
 class DynamicContentAdminMixin:
     list_display = ('text_content', 'i18n_content', 'html_content')
-    inlines = [PartInline]
     list_filter = ('format',)
 
     def text_content(self, obj):
@@ -66,11 +65,6 @@ class DynamicContentAdminMixin:
         # Dynamically append to list_display
         original_list_display = super().get_list_display(request)
         return original_list_display + self.append_list_display
-
-    def get_inlines(self, request, obj):
-        # Dynamically append to inlines
-        original_inlines = super().get_inlines(request, obj)
-        return original_inlines + self.append_inlines
 
     def get_list_filter(self, request):
         # Dynamically append to list_filter

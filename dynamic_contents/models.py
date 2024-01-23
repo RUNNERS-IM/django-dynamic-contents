@@ -46,7 +46,7 @@ class Format(BaseModel):
         ordering = ['-created_at']
 
     def __str__(self):
-        return '{}'.format(self.content)
+        return '{}({}) {}'.format(self.__class__.__name__, self.id, self.content)
 
 
 # Part
@@ -62,7 +62,7 @@ class Part(BaseModel):
         ordering = ['-created_at']
 
     def __str__(self):
-        return '{}'.format(self.content)
+        return '{}({}) {}'.format(self.__class__.__name__, self.id, self.content)
 
     def save(self, *args, **kwargs):
         super(Part, self).save(*args, **kwargs)
