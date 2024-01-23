@@ -41,9 +41,6 @@ class DynamicContentSerializerMixin(serializers.Serializer):
     format = FormatSerializer(read_only=True)
     parts = PartSerializer(many=True, read_only=True)
 
-    class Meta:
-        fields = ['id', 'format', 'parts', 'text', 'html']
-
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         parts_dict = {}
@@ -52,8 +49,8 @@ class DynamicContentSerializerMixin(serializers.Serializer):
             parts_dict.update(part)
 
         representation['parts'] = parts_dict
-        representation['text'] = instance.get_text()
-        representation['i18n'] = instance.get_i18n()
-        representation['html'] = instance.get_html()
+        representation['content_text'] = instance.get_text()
+        representation['content_i18n'] = instance.get_i18n()
+        representation['content_html'] = instance.get_html()
 
         return representation
