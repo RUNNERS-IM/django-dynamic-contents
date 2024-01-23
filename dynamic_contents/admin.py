@@ -11,7 +11,7 @@ from .models import Format, Part
 
 
 # Main Section
-class FormatAdmin(TranslationAdmin):
+class FormatAdmin(admin.ModelAdmin):
     # 기본 list_display 설정
     list_display = ('id', 'type', 'subtype', 'content', 'created_at', 'updated_at')
 
