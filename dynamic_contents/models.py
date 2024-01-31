@@ -37,6 +37,7 @@ class Format(BaseModel):
     type = models.CharField(_('Type (유형)'), max_length=100)
     subtype = models.CharField(_('Sub Type (세부 유형)'), max_length=100, null=True, blank=True)
     content = models.TextField(_('Content (내용)'))  # "{user}가 {post}를 좋아요합니다."
+    _placeholders = models.TextField(_('Placeholders'), blank=True, null=True)
 
     objects = FormatManager()
 
@@ -47,6 +48,42 @@ class Format(BaseModel):
 
     def __str__(self):
         return '{}({}) {}'.format(self.__class__.__name__, self.id, self.content)
+
+    def get_placeholders(self):
+        """
+        'placeholders' 필드를 배열로 변환하여 반환합니다.
+        """
+        if self._placeholders:
+            return self._placeholders.split(',')
+        return []
+
+    def save(self, *args, **kwargs):
+        # type과 subtype 필드를 대문자로 변환하고, _ 외의 특수문자 제거
+        self.type = self.process_type_field(self.type)
+        self.subtype = self.process_type_field(self.subtype)
+        self._placeholders = self.extract_placeholders(self.content)
+
+        super(Format, self).save(*args, **kwargs)
+
+    @staticmethod
+    def process_type_field(field_value):
+        """
+        필드 값을 대문자로 변환하고, _ 외의 특수문자를 제거합니다.
+        """
+        if field_value:
+            return re.sub(r'[^A-Z_]', '', field_value.upper())
+        return field_value
+
+    @staticmethod
+    def extract_placeholders(content):
+        """
+        주어진 content에서 '{{}}' 형식의 텍스트를 추출합니다.
+        """
+        if not content:
+            return ''
+
+        placeholders = re.findall(r'\{\{(\w+)\}\}', content)
+        return ','.join(placeholders)
 
 
 # Part
@@ -121,14 +158,19 @@ class DynamicContentModelMixin(models.Model):
     class Meta:
         abstract = True
 
-    def get_text(self):
+    def _get_format_string(self):
+        """
+        현재 언어에 맞는 format 문자열을 반환합니다.
+        """
         if not self.format:
             return ''
 
         current_language = get_language()
         content_field = f"content_{current_language}"
-        format_string = getattr(self.format, content_field, self.format.content)
+        return getattr(self.format, content_field, self.format.content)
 
+    def get_text(self):
+        format_string = self._get_format_string()
         if not format_string:
             return ''
 
@@ -137,13 +179,7 @@ class DynamicContentModelMixin(models.Model):
         return format_string
 
     def get_i18n(self):
-        if not self.format:
-            return ''
-
-        current_language = get_language()
-        content_field = f"content_{current_language}"
-        format_string = getattr(self.format, content_field, self.format.content)
-
+        format_string = self._get_format_string()
         if not format_string:
             return ''
 
@@ -162,13 +198,7 @@ class DynamicContentModelMixin(models.Model):
         return format_string
 
     def get_html(self):
-        if not self.format:
-            return ''
-
-        current_language = get_language()
-        content_field = f"content_{current_language}"
-        format_string = getattr(self.format, content_field, self.format.content)
-
+        format_string = self._get_format_string()
         if not format_string:
             return ''
 
