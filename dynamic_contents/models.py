@@ -1,9 +1,14 @@
-# Django
+# Python
 import re
+import json
+from collections import Counter
 
+# Django
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import get_language
+from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 # Class Section
@@ -35,7 +40,7 @@ class FormatManager(models.Manager):
 class Format(BaseModel):
 
     type = models.CharField(_('Type (유형)'), max_length=100)
-    subtype = models.CharField(_('Sub Type (세부 유형)'), max_length=100, null=True, blank=True)
+    subtype = models.CharField(_('Sub Type (세부 유형)'), max_length=100)
     content = models.TextField(_('Content (내용)'))  # "{user}가 {post}를 좋아요합니다."
     _placeholders = models.TextField(_('Placeholders'), blank=True, null=True)
 
@@ -63,7 +68,13 @@ class Format(BaseModel):
         self.subtype = self.process_type_field(self.subtype)
         self._placeholders = self.extract_placeholders(self.content)
 
-        super(Format, self).save(*args, **kwargs)
+        placeholders = self.get_placeholders()
+        placeholder_counts = Counter(placeholders)
+        for placeholder, count in placeholder_counts.items():
+            if count > 1:
+                raise ValidationError(f'Placeholder "{{{placeholder}}}" used multiple times in content.')
+
+        return super(Format, self).save(*args, **kwargs)
 
     @staticmethod
     def process_type_field(field_value):
@@ -152,11 +163,26 @@ class DynamicContentManagerMixin:
 
 class DynamicContentModelMixin(models.Model):
 
-    format = models.ForeignKey(Format, on_delete=models.SET_NULL, null=True)
-    parts = models.ManyToManyField(Part)
+    format = models.ForeignKey(Format, on_delete=models.SET_NULL, null=True, blank=True)
+    parts = models.ManyToManyField(Part, blank=True)
+    missing_placeholders = models.TextField(_('Missing Placeholders'), blank=True, null=True)
 
     class Meta:
         abstract = True
+
+    def get_missing_placeholders(self):
+        """
+        이 메서드는 Format의 placeholders와 연결된 Parts가 모두 존재하는지 확인합니다.
+        누락된 placeholders가 있다면 해당 placeholders를 리스트로 반환합니다.
+        """
+        if not self.format:
+            return []  # Format이 설정되지 않은 경우 빈 리스트 반환
+
+        placeholders = self.format.get_placeholders()
+        parts_fields = [part.field for part in self.parts.all()]
+        missing_placeholders = list(set(placeholders) - set(parts_fields))
+
+        return missing_placeholders
 
     def _get_format_string(self):
         """
@@ -214,6 +240,10 @@ class DynamicContentModelMixin(models.Model):
         return format_string
 
     def save(self, *args, **kwargs):
+        # Update the missing_placeholders field before saving
+        missing = self.get_missing_placeholders()
+        self.missing_placeholders = json.dumps(missing, cls=DjangoJSONEncoder)
+
         super(DynamicContentModelMixin, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

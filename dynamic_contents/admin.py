@@ -44,9 +44,10 @@ class PartInline(admin.TabularInline):
     extra = 1  # 기본적으로 보여줄 빈 인라인 폼의 수
 
 
-class DynamicContentAdminMixin:
-    list_display = ('text_content', 'i18n_content', 'html_content')
+class DynamicContentAdminMixin(admin.ModelAdmin):
+    list_display = ('text_content', 'i18n_content', 'html_content', 'missing_placeholders',)
     list_filter = ('format',)
+    readonly_fields = ('format', 'parts', 'missing_placeholders')
 
     def text_content(self, obj):
         return obj.get_text()
@@ -62,14 +63,19 @@ class DynamicContentAdminMixin:
     html_content.allow_tags = True
 
     def get_list_display(self, request):
-        # Dynamically append to list_display
-        original_list_display = super().get_list_display(request)
-        return original_list_display + self.append_list_display
+        parent_fields = super().get_list_display(request)
+        combined = dict.fromkeys(list(parent_fields) + list(self.append_list_display))
+        return tuple(combined.keys())
 
     def get_list_filter(self, request):
-        # Dynamically append to list_filter
-        original_list_filter = super().get_list_filter(request)
-        return original_list_filter + self.append_list_filter
+        parent_fields = super().get_list_filter(request)
+        combined = dict.fromkeys(list(parent_fields) + list(self.append_list_filter))
+        return tuple(combined.keys())
+
+    def get_readonly_fields(self, request, obj=None):
+        parent_fields = super().get_readonly_fields(request, obj)
+        combined = dict.fromkeys(list(parent_fields) + list(self.append_readonly_fields))
+        return tuple(combined.keys())
 
 
 admin.site.register(Format, FormatAdmin)
