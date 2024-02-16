@@ -12,7 +12,7 @@ from .utils import generate_text, generate_html, generate_i18n
 class FormatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Format
-        fields = ['type', 'subtype', 'content']
+        fields = ['id', 'type', 'subtype', 'content']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -30,7 +30,7 @@ class FormatSerializer(serializers.ModelSerializer):
 class PartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Part
-        fields = ['field', 'content', 'link', 'instance_id']
+        fields = ['id', 'field', 'content', 'link', 'instance_id']
 
     def to_representation(self, instance):
         # Part 객체를 필드 이름을 키로 사용하는 사전으로 변환

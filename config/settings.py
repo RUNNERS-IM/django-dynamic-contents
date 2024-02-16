@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'django_filters',
+    'rosetta',
     'dynamic_contents',
 ]
 
@@ -117,22 +118,28 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-LANGUAGE_CODE = 'en-us'
-LANGUAGES = (
-    ('en', 'English'),
-    ('ko', 'Korean'),
-    ('zh', 'Chinese'),
-    ('ja', 'Japanese'),
-    ('ru', 'Russian'),
-    ('es', 'Spanish'),
-)
+LANGUAGE_CODE = 'ko-KR'
+LANGUAGES = [
+    ("en", "English"),
+    ("ko", "Korean"),
+    ("ja", "Japanese"),
+    ("zh-hans", 'Simplified Chinese'),  # 간체 중국어
+    ("zh-hant", 'Traditional Chinese'),  # 번체 중국어
+    ("es", "Spanish"),
+    ("ru", "Russian"),
+    ("ar", "Arabic"),
+]
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+    os.path.join(BASE_DIR, 'dynamic_contents/locale'),
+)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -150,3 +157,6 @@ MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
 MIGRATION_MODULES = {
     'dynamic_contents': 'migrations.dynamic_contents',
 }
+
+# ROSETTA
+ROSETTA_MESSAGES_PER_PAGE = 100

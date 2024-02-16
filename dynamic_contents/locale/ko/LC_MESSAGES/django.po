@@ -1,0 +1,63 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-02-17 04:49+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: models.py:20
+msgid "Created At"
+msgstr "생성 시간"
+
+#: models.py:21
+msgid "Updated At"
+msgstr "업데이트 시간"
+
+#: models.py:54
+msgid "Type"
+msgstr "유형"
+
+#: models.py:55
+msgid "Sub Type"
+msgstr "하위 유형"
+
+#: models.py:56 models.py:115
+msgid "Content"
+msgstr "내용"
+
+#: models.py:57
+msgid "Placeholders"
+msgstr "자리 표시자"
+
+#: models.py:114
+msgid "Field"
+msgstr "필드"
+
+#: models.py:116
+msgid "Link"
+msgstr "링크"
+
+#: models.py:117
+msgid "Instance ID"
+msgstr "인스턴스 ID"
+
+#: models.py:180
+msgid "Missing Placeholders"
+msgstr "누락된 자리 표시자"
+
+#: utils.py:19
+msgid " and "
+msgstr " 그리고 "

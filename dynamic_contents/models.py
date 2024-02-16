@@ -17,8 +17,8 @@ from .utils import generate_text, generate_html, generate_i18n
 class BaseModel(models.Model):
 
     # Dates
-    created_at = models.DateTimeField(_('생성일자'), auto_now_add=True, null=True)
-    updated_at = models.DateTimeField(_('수정일자'), auto_now=True, null=True)
+    created_at = models.DateTimeField(_('Created At'), auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(_('Updated At'), auto_now=True, null=True)
 
     class Meta:
         abstract = True
@@ -51,9 +51,9 @@ class FormatManager(models.Manager):
 # Format
 class Format(BaseModel):
 
-    type = models.CharField(_('Type (유형)'), max_length=100)
-    subtype = models.CharField(_('Sub Type (세부 유형)'), max_length=100)
-    content = models.TextField(_('Content (내용)'))  # "{user}가 {post}를 좋아요합니다."
+    type = models.CharField(_('Type'), max_length=100)
+    subtype = models.CharField(_('Sub Type'), max_length=100)
+    content = models.TextField(_('Content'))  # "{user}가 {post}를 좋아요합니다."
     _placeholders = models.TextField(_('Placeholders'), blank=True, null=True)
 
     objects = FormatManager()
@@ -111,10 +111,10 @@ class Format(BaseModel):
 
 # Part
 class Part(BaseModel):
-    field = models.TextField(_('Field (필드)'), null=True, blank=True)  # user
-    content = models.TextField(_('Content (내용)'), null=True, blank=True)  # 김선욱
-    link = models.URLField(_('Link (링크)'), null=True, blank=True)  # https://runners.im/sun
-    instance_id = models.TextField(_('Instance ID (인스턴스 ID)'), null=True, blank=True)  # 1
+    field = models.TextField(_('Field'), null=True, blank=True)  # user
+    content = models.TextField(_('Content'), null=True, blank=True)  # 김선욱
+    link = models.URLField(_('Link'), null=True, blank=True)  # https://runners.im/sun
+    instance_id = models.TextField(_('Instance ID'), null=True, blank=True)  # 1
 
     class Meta:
         verbose_name = 'part'

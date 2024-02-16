@@ -1,11 +1,9 @@
-# dynamic_content_utils.py
-
+# Python
 import re
 from collections import defaultdict
-from django.utils.translation import get_language
 
-# Assuming the existence of get_text, get_i18n, get_html from the previous answer
-# Add the following new utility functions
+# Django
+from django.utils.translation import gettext_lazy as _
 
 
 def group_parts_by_field(parts):
@@ -18,7 +16,7 @@ def group_parts_by_field(parts):
 def join_contents(contents):
     # 마지막 요소 전까지는 쉼표로, 마지막 두 요소는 "and"로 연결
     if len(contents) > 1:
-        return ', '.join(contents[:-1]) + ' and ' + contents[-1]
+        return ', '.join(contents[:-1]) + _(' and ') + contents[-1]
     elif contents:
         return contents[0]
     return ''
@@ -40,7 +38,6 @@ def generate_text(format, parts):
 
 
 def generate_i18n(format, parts):
-    print('generate_i18n, generate_i18n, generate_i18n')
     format_string = format.get_content()
     if not format_string:
         return ''
