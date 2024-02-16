@@ -10,6 +10,8 @@ from django.utils.translation import get_language
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 
+# App
+from .utils import generate_text, generate_html, generate_i18n
 
 # Class Section
 class BaseModel(models.Model):
@@ -23,6 +25,16 @@ class BaseModel(models.Model):
 
     def __str__(self):
         return '{}({})'.format(self.__class__.__name__, self.id)
+
+    def get_content(self):
+        """
+        현재 활성화된 언어에 맞는 content 값을 반환합니다.
+        """
+        current_language = get_language()
+        # content 필드에 대한 현재 언어 버전의 속성명을 생성합니다.
+        content_field_name = f"content_{current_language.replace('-', '_')}"
+        # 현재 언어 버전의 content 값을 반환하되, 없다면 기본 content 값을 사용합니다.
+        return getattr(self, content_field_name, self.content)
 
 
 class FormatManager(models.Manager):
@@ -52,7 +64,7 @@ class Format(BaseModel):
         ordering = ['-created_at']
 
     def __str__(self):
-        return '{}({}) {}'.format(self.__class__.__name__, self.id, self.content)
+        return '{}({}) {}'.format(self.__class__.__name__, self.id, self.get_content())
 
     def get_placeholders(self):
         """
@@ -82,7 +94,7 @@ class Format(BaseModel):
         필드 값을 대문자로 변환하고, _ 외의 특수문자를 제거합니다.
         """
         if field_value:
-            return re.sub(r'[^A-Z_]', '', field_value.upper())
+            return re.sub(r'[^A-Z_/]', '', field_value.upper())
         return field_value
 
     @staticmethod
@@ -184,28 +196,17 @@ class DynamicContentModelMixin(models.Model):
 
         return missing_placeholders
 
-    def _get_format_string(self):
-        """
-        현재 언어에 맞는 format 문자열을 반환합니다.
-        """
-        if not self.format:
-            return ''
-
-        current_language = get_language()
-        content_field = f"content_{current_language}"
-        return getattr(self.format, content_field, self.format.content)
-
     def get_text(self):
-        format_string = self._get_format_string()
+        format_string = self.format.get_content()
         if not format_string:
             return ''
 
         for part in self.parts.all():
-            format_string = format_string.replace("{{" + part.field + "}}", part.content or '')
+            format_string = format_string.replace("{{" + part.field + "}}", part.get_content() or '')
         return format_string
 
     def get_i18n(self):
-        format_string = self._get_format_string()
+        format_string = self.get_content_for_current_language()
         if not format_string:
             return ''
 
@@ -217,7 +218,7 @@ class DynamicContentModelMixin(models.Model):
         for part in self.parts.all():
             if part.field in index_map:
                 idx = index_map[part.field]
-                replacement = f'<{idx}>{part.content}</{idx}>'
+                replacement = f'<{idx}>{part.get_content()}</{idx}>'
                 placeholder = f"{{{{{part.field}}}}}"
                 format_string = format_string.replace(placeholder, replacement, 1)  # 한 번만 대체
 
@@ -232,7 +233,7 @@ class DynamicContentModelMixin(models.Model):
         for part in self.parts.all():
             # 링크가 있거나 없거나 항상 <a> 태그를 사용
             link = part.link or '#'
-            replacement = f'<a class="{part.field}" href="{link}">{part.content}</a>'
+            replacement = f'<a class="{part.field}" href="{link}">{part.get_content()}</a>'
 
             placeholder = f"{{{{{part.field}}}}}"
             format_string = format_string.replace(placeholder, replacement)
@@ -252,3 +253,38 @@ class DynamicContentModelMixin(models.Model):
         """
         self.parts.all().delete()
         super(DynamicContentModelMixin, self).delete(*args, **kwargs)
+
+
+class DynamicContent:
+    def __init__(self, format, parts):
+        """
+        Initializes a utility object to work with dynamic content.
+
+        :param format_instance: An instance or mock of the Format model.
+        :param parts_queryset: A list or mock queryset of Part instances.
+        """
+        self.format = format
+        self.parts = parts
+
+    def get_missing_placeholders(self):
+        if not self.format:
+            return []
+
+        placeholders = self.format.get_placeholders()
+        parts_fields = [part.field for part in self.parts]
+        missing_placeholders = list(set(placeholders) - set(parts_fields))
+
+        return missing_placeholders
+
+    def get_text(self):
+        # Assuming generate_text is a standalone function that processes the format and parts
+        return generate_text(self.format, self.parts)
+
+    def get_i18n(self):
+        # Assuming generate_i18n is a standalone function
+        return generate_i18n(self.format, self.parts)
+
+    def get_html(self):
+        # Assuming generate_html is a standalone function
+        return generate_html(self.format, self.parts)
+

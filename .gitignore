@@ -341,3 +341,5 @@ aws-cgp-stg.pem
 aws-cgp-stg.pub
 
 *.sqlite3
+
+migrations

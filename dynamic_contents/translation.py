@@ -6,4 +6,9 @@ class FormatTranslationOptions(TranslationOptions):
     fields = ('content',)
 
 
+class PartTranslationOptions(TranslationOptions):
+    fields = ('content',)
+
+
 translator.register(Format, FormatTranslationOptions)
+translator.register(Part, PartTranslationOptions)

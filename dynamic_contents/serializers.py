@@ -1,6 +1,12 @@
-from rest_framework import serializers
-from .models import Format, Part
+# Django
 from django.utils.translation import get_language
+
+# DRF
+from rest_framework import serializers
+
+# App
+from .models import Format, Part
+from .utils import generate_text, generate_html, generate_i18n
 
 
 class FormatSerializer(serializers.ModelSerializer):
@@ -45,12 +51,14 @@ class DynamicContentSerializerMixin(serializers.Serializer):
         representation = super().to_representation(instance)
         parts_dict = {}
 
+        print('DynamicContentSerializerMixin', representation)
         for part in representation['parts']:
             parts_dict.update(part)
 
         representation['parts'] = parts_dict
-        representation['content_text'] = instance.get_text()
-        representation['content_i18n'] = instance.get_i18n()
-        representation['content_html'] = instance.get_html()
+
+        representation['content_text'] = generate_text(instance.format, instance.parts)
+        representation['content_i18n'] = generate_i18n(instance.format, instance.parts)
+        representation['content_html'] = generate_html(instance.format, instance.parts)
 
         return representation
