@@ -51,9 +51,13 @@ class DynamicContentSerializerMixin(serializers.Serializer):
         representation = super().to_representation(instance)
         parts_dict = {}
 
-        print('DynamicContentSerializerMixin', representation)
-        for part in representation['parts']:
-            parts_dict.update(part)
+        for part_representation in representation['parts']:
+            # part_representation은 PartSerializer에서 반환된 사전 형식
+            for field, part_info in part_representation.items():
+                if field not in parts_dict:
+                    parts_dict[field] = [part_info]  # 처음 나타난 field라면 배열로 초기화
+                else:
+                    parts_dict[field].append(part_info)  # 이미 존재하는 field라면 배열에 추가
 
         representation['parts'] = parts_dict
 
