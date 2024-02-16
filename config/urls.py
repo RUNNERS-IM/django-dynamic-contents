@@ -24,9 +24,9 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Django Package Boilerplate API",
+        title="Django Dynamic Contents API",
         default_version="v1",
-        description="Django Package Boilerplate API Documents",
+        description="Django Dynamic Contents API Documents",
     ),
     public=True,
 )

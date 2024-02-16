@@ -197,48 +197,16 @@ class DynamicContentModelMixin(models.Model):
         return missing_placeholders
 
     def get_text(self):
-        format_string = self.format.get_content()
-        if not format_string:
-            return ''
-
-        for part in self.parts.all():
-            format_string = format_string.replace("{{" + part.field + "}}", part.get_content() or '')
-        return format_string
+        # generate_text 함수를 사용하여 텍스트 생성
+        return generate_text(self.format, self.parts.all())
 
     def get_i18n(self):
-        format_string = self.get_content_for_current_language()
-        if not format_string:
-            return ''
-
-        # 플레이스홀더를 찾아서 순서대로 인덱스 매핑
-        placeholders = re.findall(r'\{\{(\w+)\}\}', format_string)
-        index_map = {placeholder: idx for idx, placeholder in enumerate(placeholders)}
-
-        # Part 객체를 순회하며 필드를 대체 문자열로 변환
-        for part in self.parts.all():
-            if part.field in index_map:
-                idx = index_map[part.field]
-                replacement = f'<{idx}>{part.get_content()}</{idx}>'
-                placeholder = f"{{{{{part.field}}}}}"
-                format_string = format_string.replace(placeholder, replacement, 1)  # 한 번만 대체
-
-        return format_string
+        # generate_i18n 함수를 사용하여 국제화된 텍스트 생성
+        return generate_i18n(self.format, self.parts.all())
 
     def get_html(self):
-        format_string = self._get_format_string()
-        if not format_string:
-            return ''
-
-        # Part 객체를 순회하며 필드를 대체 문자열로 변환
-        for part in self.parts.all():
-            # 링크가 있거나 없거나 항상 <a> 태그를 사용
-            link = part.link or '#'
-            replacement = f'<a class="{part.field}" href="{link}">{part.get_content()}</a>'
-
-            placeholder = f"{{{{{part.field}}}}}"
-            format_string = format_string.replace(placeholder, replacement)
-
-        return format_string
+        # generate_html 함수를 사용하여 HTML 콘텐츠 생성
+        return generate_html(self.format, self.parts.all())
 
     def save(self, *args, **kwargs):
         # Update the missing_placeholders field before saving
