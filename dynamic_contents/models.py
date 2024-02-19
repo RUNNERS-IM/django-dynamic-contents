@@ -34,7 +34,10 @@ class BaseModel(models.Model):
         # content 필드에 대한 현재 언어 버전의 속성명을 생성합니다.
         content_field_name = f"content_{current_language.replace('-', '_')}"
         # 현재 언어 버전의 content 값을 반환하되, 없다면 기본 content 값을 사용합니다.
-        return getattr(self, content_field_name, self.content)
+        if content := getattr(self, content_field_name):
+            return content
+        else:
+            return self.content
 
 
 class FormatManager(models.Manager):

@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 def group_parts_by_field(parts):
     grouped_parts = defaultdict(list)
-    for part in parts:
+    for part in parts.all():
         grouped_parts[part.field].append(part.get_content())
     return grouped_parts
 
@@ -26,9 +26,10 @@ def generate_text(format, parts):
     """
     Generates text from a format and parts, joining multiple contents for the same field.
     """
-    format_string = format.get_content()
-    if not format_string:
+    if not format:
         return ''
+
+    format_string = format.get_content()
 
     grouped_parts = group_parts_by_field(parts)
     for field, contents in grouped_parts.items():
@@ -38,13 +39,14 @@ def generate_text(format, parts):
 
 
 def generate_i18n(format, parts):
-    format_string = format.get_content()
-    if not format_string:
+    if not format:
         return ''
+
+    format_string = format.get_content()
 
     # grouped_parts에 각 part.field 별로 part.content를 그룹화합니다.
     grouped_parts = defaultdict(list)
-    for part in parts:
+    for part in parts.all():
         grouped_parts[part.field].append(part)
 
     # placeholders를 찾아서 각 placeholder에 대한 초기 인덱스 값을 매핑합니다.
@@ -70,13 +72,14 @@ def generate_i18n(format, parts):
 
 
 def generate_html(format, parts):
-    format_string = format.get_content()
-    if not format_string:
+    if not format:
         return ''
+
+    format_string = format.get_content()
 
     grouped_parts = defaultdict(list)
 
-    for part in parts:
+    for part in parts.all():
         link = part.link if hasattr(part, 'link') and part.link else '#'
         html_link = f'<a href="{link}">{part.get_content()}</a>'
         grouped_parts[part.field].append(html_link)
