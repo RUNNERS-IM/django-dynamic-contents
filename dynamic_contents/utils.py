@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 def group_parts_by_field(parts):
     grouped_parts = defaultdict(list)
-    for part in parts.all():
+    for part in parts if type(parts) == list else parts.all():
         grouped_parts[part.field].append(part.get_content())
     return grouped_parts
 
@@ -46,7 +46,7 @@ def generate_i18n(format, parts):
 
     # grouped_parts에 각 part.field 별로 part.content를 그룹화합니다.
     grouped_parts = defaultdict(list)
-    for part in parts.all():
+    for part in parts if type(parts) == list else parts.all():
         grouped_parts[part.field].append(part)
 
     # placeholders를 찾아서 각 placeholder에 대한 초기 인덱스 값을 매핑합니다.
@@ -79,7 +79,7 @@ def generate_html(format, parts):
 
     grouped_parts = defaultdict(list)
 
-    for part in parts.all():
+    for part in parts if type(parts) == list else parts.all():
         link = part.link if hasattr(part, 'link') and part.link else '#'
         html_link = f'<a href="{link}">{part.get_content()}</a>'
         grouped_parts[part.field].append(html_link)
