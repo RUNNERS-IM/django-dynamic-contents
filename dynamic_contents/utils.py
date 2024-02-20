@@ -34,7 +34,8 @@ def generate_text(format, parts):
     grouped_parts = group_parts_by_field(parts)
     for field, contents in grouped_parts.items():
         joined_contents = join_contents(contents)
-        format_string = format_string.replace(f"{{{{{field}}}}}", joined_contents)
+        if joined_contents:
+            format_string = format_string.replace(f"{{{{{field}}}}}", joined_contents)
     return format_string
 
 

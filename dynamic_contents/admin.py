@@ -45,9 +45,9 @@ class PartInline(admin.TabularInline):
 
 
 class DynamicContentAdminMixin(admin.ModelAdmin):
-    list_display = ('text_content', 'i18n_content', 'html_content', 'missing_placeholders',)
-    list_filter = ('format',)
-    readonly_fields = ('format', 'parts', 'missing_placeholders')
+    append_list_display = ('text_content', 'i18n_content', 'html_content', 'missing_placeholders',)
+    append_list_filter = ('format',)
+    append_readonly_fields = ('format', 'parts', 'missing_placeholders')
 
     def text_content(self, obj):
         return obj.get_text()
