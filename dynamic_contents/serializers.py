@@ -61,8 +61,10 @@ class DynamicContentSerializerMixin(serializers.Serializer):
 
         representation['parts'] = parts_dict
 
-        representation['content_text'] = generate_text(instance.format, instance.parts.all())
-        representation['content_i18n'] = generate_i18n(instance.format, instance.parts.all())
-        representation['content_html'] = generate_html(instance.format, instance.parts.all())
+        instance_parts = instance.parts if isinstance(instance.parts, list) else instance.parts.all()
+
+        representation['content_text'] = generate_text(instance.format, instance_parts)
+        representation['content_i18n'] = generate_i18n(instance.format, instance_parts)
+        representation['content_html'] = generate_html(instance.format, instance_parts)
 
         return representation
