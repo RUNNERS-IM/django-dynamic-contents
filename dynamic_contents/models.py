@@ -212,9 +212,10 @@ class DynamicContentModelMixin(models.Model):
         return generate_html(self.format, self.parts.all())
 
     def save(self, *args, **kwargs):
-        # Update the missing_placeholders field before saving
-        missing = self.get_missing_placeholders()
-        self.missing_placeholders = json.dumps(missing, cls=DjangoJSONEncoder)
+        if self.id:
+            # Update the missing_placeholders field before saving
+            missing = self.get_missing_placeholders()
+            self.missing_placeholders = json.dumps(missing, cls=DjangoJSONEncoder)
 
         super(DynamicContentModelMixin, self).save(*args, **kwargs)
 
