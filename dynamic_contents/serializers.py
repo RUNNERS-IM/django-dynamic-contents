@@ -4,6 +4,9 @@ from django.utils.translation import get_language
 # DRF
 from rest_framework import serializers
 
+# Third Party
+from drf_yasg.utils import swagger_serializer_method
+
 # App
 from .models import Format, Part
 from .utils import generate_text, generate_html, generate_i18n
@@ -45,7 +48,12 @@ class PartSerializer(serializers.ModelSerializer):
 
 class DynamicContentSerializerMixin(serializers.Serializer):
     format = FormatSerializer(read_only=True)
-    parts = PartSerializer(many=True, read_only=True)
+    parts = serializers.SerializerMethodField()
+
+    @swagger_serializer_method(PartSerializer(many=True, read_only=True))
+    def get_parts(self, obj):
+        parts = getattr(obj, 'prefetched_parts', obj.parts.all())
+        return PartSerializer(parts, many=True).data
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -61,7 +69,10 @@ class DynamicContentSerializerMixin(serializers.Serializer):
 
         representation['parts'] = parts_dict
 
-        instance_parts = instance.parts if isinstance(instance.parts, list) else instance.parts.all()
+        if isinstance(representation['parts'], list):
+            instance_parts = instance.parts
+        else:
+            instance_parts = getattr(instance, 'prefetched_parts', instance.parts.all())
 
         representation['content_text'] = generate_text(instance.format, instance_parts)
         representation['content_i18n'] = generate_i18n(instance.format, instance_parts)
