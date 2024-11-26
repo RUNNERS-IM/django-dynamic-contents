@@ -52,14 +52,18 @@ class DynamicContentSerializerMixin(serializers.Serializer):
 
     @swagger_serializer_method(PartSerializer(many=True, read_only=True))
     def get_parts(self, obj):
-        parts = getattr(obj, 'prefetched_parts', obj.parts.all())
+        if isinstance(obj.parts, list):
+            parts = obj.parts
+        else:
+            parts = getattr(obj, "prefetched_parts", obj.parts.all())
         return PartSerializer(parts, many=True).data
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+
         parts_dict = {}
 
-        for part_representation in representation['parts']:
+        for part_representation in representation["parts"]:
             # part_representation은 PartSerializer에서 반환된 사전 형식
             for field, part_info in part_representation.items():
                 if field not in parts_dict:
@@ -67,15 +71,16 @@ class DynamicContentSerializerMixin(serializers.Serializer):
                 else:
                     parts_dict[field].append(part_info)  # 이미 존재하는 field라면 배열에 추가
 
-        representation['parts'] = parts_dict
+        representation["parts"] = parts_dict
 
-        if isinstance(representation['parts'], list):
+        if isinstance(instance.parts, list):
             instance_parts = instance.parts
         else:
-            instance_parts = getattr(instance, 'prefetched_parts', instance.parts.all())
+            instance_parts = getattr(instance, "prefetched_parts", instance.parts.all())
 
-        representation['content_text'] = generate_text(instance.format, instance_parts)
-        representation['content_i18n'] = generate_i18n(instance.format, instance_parts)
-        representation['content_html'] = generate_html(instance.format, instance_parts)
+        representation["content_text"] = generate_text(instance.format, instance_parts)
+        representation["content_i18n"] = generate_i18n(instance.format, instance_parts)
+        representation["content_html"] = generate_html(instance.format, instance_parts)
 
         return representation
+
